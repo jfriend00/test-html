@@ -10,8 +10,8 @@ img.photo {
 .centerBox {
     margin-left: auto;
     margin-right: auto;
-    padding-left: 2em;
-    padding-right: 2em;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
 }
 
 .content {
