@@ -4,6 +4,7 @@ const renderString = nunjucks.renderString;
 const glob = require('glob');
 const fs = require('fs');
 const path = require('path');
+const mkdirp = require('mkdirp');
 
 
 if (process.argv.length < 4) {
@@ -143,6 +144,7 @@ async function run() {
             outputFile = replaceExtension(outputFile, "html");
             fs.writeFileSync(outputFile, renderedData);
 
+            mkdirp.sync(outputDirLocal);
             let outputFileLocal = replaceExtension(path.join(outputDirLocal, base), "html");
             renderedData = modifyBaseHrefLocal(renderedData, outputDir);
 

@@ -5,6 +5,7 @@
   "main": "precompile.js",
   "dependencies": {
     "glob": "^7.1.6",
+    "mkdirp": "^1.0.4",
     "nunjucks": "^3.2.2"
   },
   "devDependencies": {},
