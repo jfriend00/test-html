@@ -1,26 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <style type="text/css">
-    /* body {font-size: calc(0.5em + 1vw);} */
-    img {
-      max-width: 100%;
-      height: auto;
-    }
-  </style>
-  <base href="/test-html/">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta charset="utf-8">
-  <title>{{title}}</title>
-</head>
-<body>
-  <div>
+{% extends "./templates/main.njk" %}
+{% block content %}
+<div>
       <p>{{title}}</p>
       <p>This is some <b>bold text</b>.  And nothing more.</p>
       <p><a href="go.html">Go go.html</a></p>
       <a href="https://jfriend.smugmug.com/Family/John-Muir-Trail/Favorite-Landscapes/#sm-tile-image-yui_3_8_0_1_1607835079207_1502">
         <img src="https://photos.smugmug.com/Family/John-Muir-Trail/Favorite-Landscapes/i-Gn4pnRL/0/2167ae39/XL/JMT-20130722091034-2340-XL.jpg">
       </a>
-  </div>
-</body>
-</html>
+</div>
+{% endblock %}
