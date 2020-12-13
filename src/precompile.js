@@ -116,7 +116,8 @@ function prepareHTML(str) {
 }
 
 function modifyBaseHrefLocal(str, dir) {
-    return str.replace('<base href="/test-html/">', `<base href="file:///${dir.replace(/\\/g, "/")}/">`)
+    return str.replace(/<base[^>]*>/, `<base href="file:///${dir.replace(/\\/g, "/")}/">`)
+    //return str.replace('<base href="/test-html/">', `<base href="file:///${dir.replace(/\\/g, "/")}/">`)
 }
 
 async function run() {
