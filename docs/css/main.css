@@ -17,3 +17,11 @@ img.photo {
 .content {
     max-width: 50em;
 }
+
+.subtitle {
+    margin-top: .1em;
+}
+
+.withSubtitle {
+    margin-bottom: .1em;
+}
