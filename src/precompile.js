@@ -1,6 +1,6 @@
 const nunjucks = require('nunjucks');
 const { promisify } = require('util');
-const renderString = promisify(nunjucks.renderString);
+const renderString = nunjucks.renderString;
 const glob = require('glob');
 const fs = require('fs');
 const path = require('path');
@@ -18,7 +18,6 @@ const inputPattern = process.argv[2];
 const outputDir = path.resolve(process.argv[3]);
 
 const inputFiles = glob.sync(inputPattern, { absolute: true });
-console.log(inputFiles);
 if (inputFiles.length === 0) {
     console.log(`No files match input pattern ${inputPattern}`);
     process.exit(2);
@@ -55,7 +54,7 @@ function readJSONSync(filename) {
     return data;
 }
 
-const renderData = readJSONSync("./render.json");
+const renderInput = readJSONSync("./render.json");
 
 function replaceExtension(filename, newExt) {
     let ext = path.extname(filename);
@@ -69,17 +68,44 @@ function replaceExtension(filename, newExt) {
     return newName;
 }
 
+// nunjucks loader to allow relative path loading
+function MyLoader(opts = {}) {
+    // configuration
+    this.opts = {};
+    Object.assign(this.opts, opts);
+}
+
+MyLoader.prototype.getSource = function(name) {
+    // load the template
+    // return an object with:
+    //   - src:     String. The template source.
+    //   - path:    String. Path to template.
+    //   - noCache: Bool. Don't cache the template (optional).
+    let obj = {};
+    obj.name = path.resolve(this.opts.base, name);
+    obj.src = fs.readFileSync(obj.name).toString();
+    obj.noCache = true;
+    return obj;
+}
+
+// const env = new nunjucks.Environment(new MyLoader({}));
+
 async function run() {
     let cntr = 0;
     let errors = 0;
+    let env;
     for (let file of inputFiles) {
         try {
             let base = path.basename(file);
             let dir = file.slice(0, -(base.length + 1));
             // configure nunjucks so that relative paths in templates work properly
-            nunjucks.configure(dir);
+            // use a cached environment so we aren't always making a new one
+            if (!env || env._dir !== dir) {
+                env = new nunjucks.Environment(new MyLoader({ base: dir }));
+                env._dir = dir;
+            }
             let data = fs.readFileSync(file).toString();
-            let renderedData = await renderString(data, renderData);
+            let renderedData = env.renderString(data, renderInput);
             let outputFile = path.join(outputDir, base);
             outputFile = replaceExtension(outputFile, "html");
             console.log(`Rendering ${file} => ${outputFile}`);
@@ -103,13 +129,3 @@ run().then(result => {
 }).catch(err => {
     console.log(err);
 });
-
-/*
-nunjucks.renderString("My name is: {{name}}", { name: "John" }, (err, res) => {
-    if (err) {
-        console.log(err);
-    } else {
-        console.log(res);
-    }
-});
-*/
