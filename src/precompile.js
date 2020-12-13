@@ -104,17 +104,16 @@ async function run() {
                 env = new nunjucks.Environment(new MyLoader({ base: dir }));
                 env._dir = dir;
             }
+            let outputFile = path.join(outputDir, base);
+            console.log(`Rendering ${path.resolve(file)} => ${outputFile}`);
             let data = fs.readFileSync(file).toString();
             let renderedData = env.renderString(data, renderInput);
-            let outputFile = path.join(outputDir, base);
             outputFile = replaceExtension(outputFile, "html");
-            console.log(`Rendering ${file} => ${outputFile}`);
             fs.writeFileSync(outputFile, renderedData);
             ++cntr;
         } catch (e) {
             ++errors;
-            console.log(e);
-            //console.log(`Can't render ${outputFile}`);
+            console.log("\n", e, "\n");
         }
     }
     if (!errors) {
