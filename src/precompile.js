@@ -16,6 +16,7 @@ if (process.argv.length < 4) {
 
 const inputPattern = process.argv[2];
 const outputDir = path.resolve(process.argv[3]);
+const outputDirLocal = outputDir + ".local";
 
 const inputFiles = glob.sync(inputPattern, { absolute: true });
 if (inputFiles.length === 0) {
@@ -113,6 +114,10 @@ function prepareHTML(str) {
     return newStr;
 }
 
+function modifyBaseHrefLocal(str, dir) {
+    return str.replace('<base href="/test-html/">', `<base href="file:///${dir.replace(/\\/g, "/")}/">`)
+}
+
 async function run() {
     let cntr = 0;
     let errors = 0;
@@ -137,6 +142,11 @@ async function run() {
 
             outputFile = replaceExtension(outputFile, "html");
             fs.writeFileSync(outputFile, renderedData);
+
+            let outputFileLocal = replaceExtension(path.join(outputDirLocal, base), "html");
+            renderedData = modifyBaseHrefLocal(renderedData, outputDir);
+
+            fs.writeFileSync(outputFileLocal, renderedData);
             ++cntr;
         } catch (e) {
             ++errors;
