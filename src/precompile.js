@@ -88,7 +88,30 @@ MyLoader.prototype.getSource = function(name) {
     return obj;
 }
 
-// const env = new nunjucks.Environment(new MyLoader({}));
+const textRegex = /<text>(.*?)<\/text>/igms;
+
+// uses negative lookahead to see if it's an entity or not
+const ampRegex = /(&)(?![^\s.]+;)/igms;
+
+function prepareEntities(str) {
+    // I'm thinking that I at least need to do something about some
+    // special characters like & < >, but I want to allow HTML tags
+    // and legit HTML entities to already be in the text
+    return str.replace(ampRegex, "&amp;")
+}
+
+function prepareHTML(str) {
+    // find <text></text> and add <p></p> tags
+    let newStr = str.replace(textRegex, function(match, p1) {
+        // replace chars with entities
+        p1 = prepareEntities(p1);
+        let pieces = p1.split(/[\n\r]+/).filter(p => {
+            return !!p;
+        });
+        return "<p>" + pieces.join("</p>\n\r\n\r<p>") + "</p>";
+    });
+    return newStr;
+}
 
 async function run() {
     let cntr = 0;
@@ -108,6 +131,10 @@ async function run() {
             console.log(`Rendering ${path.resolve(file)} => ${outputFile}`);
             let data = fs.readFileSync(file).toString();
             let renderedData = env.renderString(data, renderInput);
+
+            // now pre-process the HTML a bit
+            renderedData = prepareHTML(renderedData);
+
             outputFile = replaceExtension(outputFile, "html");
             fs.writeFileSync(outputFile, renderedData);
             ++cntr;
