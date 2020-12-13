@@ -15,9 +15,9 @@ if (process.argv.length < 4) {
 }
 
 const inputPattern = process.argv[2];
-const outputDir = process.argv[3];
+const outputDir = path.resolve(process.argv[3]);
 
-const inputFiles = glob.sync(inputPattern);
+const inputFiles = glob.sync(inputPattern, { absolute: true });
 console.log(inputFiles);
 if (inputFiles.length === 0) {
     console.log(`No files match input pattern ${inputPattern}`);
@@ -57,22 +57,38 @@ function readJSONSync(filename) {
 
 const renderData = readJSONSync("./render.json");
 
+function replaceExtension(filename, newExt) {
+    let ext = path.extname(filename);
+    let newName;
+    if (ext) {
+        newName = filename.slice(0, -ext.length);
+    } else {
+        newName = filename;
+    }
+    newName += "." + newExt;
+    return newName;
+}
+
 async function run() {
     let cntr = 0;
     let errors = 0;
     for (let file of inputFiles) {
         try {
             let base = path.basename(file);
+            let dir = file.slice(0, -(base.length + 1));
+            // configure nunjucks so that relative paths in templates work properly
+            nunjucks.configure(dir);
             let data = fs.readFileSync(file).toString();
             let renderedData = await renderString(data, renderData);
             let outputFile = path.join(outputDir, base);
-            fs.writeFileSync(outputFile, renderedData);
+            outputFile = replaceExtension(outputFile, "html");
             console.log(`Rendering ${file} => ${outputFile}`);
+            fs.writeFileSync(outputFile, renderedData);
             ++cntr;
         } catch (e) {
             ++errors;
-            console.log(`Can't render ${outputFile}`);
             console.log(e);
+            //console.log(`Can't render ${outputFile}`);
         }
     }
     if (!errors) {
