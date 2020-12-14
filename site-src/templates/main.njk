@@ -8,6 +8,21 @@
   <title>{{title}}</title>
 </head>
 <body>
+    <div class="header">
+      <div class="container">
+        <div class="column">
+          <h2>The John Muir Trail</h2>
+        </div>
+        <div class="column">
+          Jump to Page:
+          <select name="cars" id="cars">
+            <option value="volvo">Volvo</option>
+            <option value="saab">Saab</option>
+            <option value="mercedes">Mercedes</option>
+            <option value="audi">Audi</option>
+          </select>        </div>
+      </div>
+    </div>
     <div class="content centerBox">
         {% block content %}
         {% endblock %}
