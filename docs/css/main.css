@@ -49,7 +49,23 @@ img.right {
   width: 100%;
   overflow: hidden;
   background-color: #AAA;
-  display: table;
+  align-items: baseline;
+}
+.header .container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header .left {
+    display: flex;
+}
+
+.header .right {
+    text-align: right;
+    vertical-align: bottom;
+    display: flex;
 }
 
 .header h2 {
@@ -57,5 +73,4 @@ img.right {
 }
 
 .column {
-  display: table-cell;
 }
